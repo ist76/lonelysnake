@@ -62,9 +62,9 @@ int SnakeLogic(cpoint const *gamemap, cpoint *apple, int *ticks, snake *vyper)
      
      if ((head.x == apple->x) && (head.y == apple->y))
      {
-          vyper->coins = vyper->coins + 95 + 5*vyper->len;
-          ++vyper->len;
-          *ticks -= 2;            
+          vyper->coins = vyper->coins + 95 + 5*vyper->len;  // Score growth depending on tail length
+          ++vyper->len; // The snake has become longer, and the coordinate of the tail has already moved to where we need it
+          *ticks -= 2;  // Speed ​​up the game with every apple you eat
           *apple = GetApple(gamemap, vyper->len, vyper->body);
      }
      
