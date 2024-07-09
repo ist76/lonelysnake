@@ -16,6 +16,6 @@ typedef struct snake      // All snake data
 } snake;
 
 void SnakeRestart(cpoint const *gamemap, int *ticks, snake *vyper);
-int IfCannibal(cpoint dot, int len, cpoint const *body);
-cpoint GetApple(cpoint const *gamemap, int len, cpoint const *body);
+int IfCannibal(cpoint const *dot, int const *len, cpoint const *body);
+cpoint GetApple(cpoint const *gamemap, int const *len, cpoint const *body);
 int SnakeLogic(cpoint const *gamemap, cpoint *apple, int *ticks, snake *vyper);
