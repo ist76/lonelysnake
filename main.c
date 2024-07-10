@@ -180,16 +180,14 @@ VOID WriteSavegame(cpoint maps, int scale, int maxs)
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
      savedata gamesettings = ReadSavegame();
-     //cpoint map;   // Level size in cells
-     //int winScale;                 // Scale
-     int GameTicks;                     // Latency (in ms) between game loops
+     int GameTicks;   // Latency (in ms) between game loops
      snake anaconda;  // Our snake
      
-     cpoint map = gamesettings.gamemap;
-     int winScale = gamesettings.gamescale;
+     cpoint map = gamesettings.gamemap;       // Level size in cells
+     int winScale = gamesettings.gamescale;   // Scale
      anaconda.maxscore = gamesettings.gamemaxscore;
 
-     RECT ScoreTable;                   // Size of score table
+     RECT ScoreTable;                        // Size of score table
      SetRect(&ScoreTable, 0, 0, 7 * winScale, 16 * winScale);
      
      WNDCLASSW wcl;
@@ -221,7 +219,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
           HMENU hPopMenuFile1 = CreatePopupMenu();
           HMENU hPopMenuFile2 = CreatePopupMenu();
 
-          AppendMenuW(My_Main_Menu_Bar, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile1, L"Map size"); // В примерах UINT, реально UINT_PTR!
+          AppendMenuW(My_Main_Menu_Bar, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile1, L"Map size");
           AppendMenuW(My_Main_Menu_Bar, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile2, L"Scale");
             
           AppendMenuW(hPopMenuFile1, MF_STRING , 1001, L"Small");
@@ -236,11 +234,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      
      MSG msg;
    
-     SnakeRestart(&map, &GameTicks, &anaconda);            // Game initialization
-     cpoint apple = GetApple(&map, &anaconda.len, anaconda.body);  // And the creation of an apple
-     DWORD next_game_tick = GetTickCount();                // Timer for game loop
-     DWORD next_render_tick = GetTickCount();              // Timer for render loop
-     srand(GetTickCount());                                // For generate Apple
+     SnakeRestart(&map, &GameTicks, &anaconda);                     // Game initialization
+     cpoint apple = GetApple(&map, &anaconda.len, anaconda.body);   // And the creation of an apple
+     DWORD next_game_tick = GetTickCount();                         // Timer for game loop
+     DWORD next_render_tick = GetTickCount();                       // Timer for render loop
+     srand(GetTickCount());                                         // For generate Apple
 
      for(;;) // Main Game loop
      {
