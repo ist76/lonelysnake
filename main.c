@@ -89,28 +89,32 @@ void ScoresShow(HDC dc, int scale, int coins, int maxscore, HFONT font, RECT * c
 }
 
 // Converts keystrokes into movement direction (in game logic format)
-void DispatchVector(WPARAM key, cpoint * newvect)
+void DispatchVector(WPARAM key, cpoint * newvect, DWORD * next_tick)
 {
      switch (key)
      {
-     case 0x25:
+     case 0x25:               // Key RIGHT
           newvect->x = -1;
           newvect->y = 0;
           break;
      
-     case 0x27:
+     case 0x27:               // Key LEFT
           newvect->x = 1;
           newvect->y = 0;
           break;
      
-     case 0x26:
+     case 0x26:               // Key UP
           newvect->x = 0;
           newvect->y = -1;
           break;
      
-     case 0x28:
+     case 0x28:               // Key DOWN
           newvect->x = 0;
           newvect->y = 1;
+          break;
+
+     case 0x13:               // Key PAUSE
+          *next_tick = *next_tick != UINT_MAX ? UINT_MAX : GetTickCount();
           break;
      
      default:
@@ -118,14 +122,72 @@ void DispatchVector(WPARAM key, cpoint * newvect)
      }
 }
 
+void DispatchMenu(WPARAM val, cpoint * map, int * scale)
+{
+     switch (val)
+     {
+     case 1001:
+          map->x = 24;
+          map->y = 16;
+          break;
+
+     case 1002:
+          map->x = 30;
+          map->y = 20;
+          break;
+
+     case 1003:
+          map->x = 36;
+          map->y = 24;
+          break;
+
+     case 1011:
+          *scale = 32;
+          break;
+
+     case 1012:
+          *scale = 38;
+          break;
+     
+     default:
+          break;
+     }
+}
+
+savedata ReadSavegame()
+{
+     savedata usersave = { .gamemap = {.x = 30, .y = 20},
+                           .gamescale = 38,
+                           .gamemaxscore = 0};
+     HANDLE hFile = CreateFile(L"snake.sav", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+     if (INVALID_HANDLE_VALUE == hFile) return usersave; // FIXME! Write check later
+     ReadFile(hFile, &usersave, sizeof(usersave), NULL, NULL);
+     CloseHandle(hFile);
+     return usersave;
+}
+
+VOID WriteSavegame(cpoint maps, int scale, int maxs)
+{
+     HANDLE hFile = CreateFile(L"snake.sav", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+     if (INVALID_HANDLE_VALUE == hFile) return;
+     savedata usersave = { .gamemap = maps,
+                           .gamescale = scale,
+                           .gamemaxscore = maxs};
+     WriteFile(hFile, &usersave, sizeof(usersave), NULL, NULL);
+     CloseHandle(hFile);
+}
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-     cpoint map = {.x = 30, .y = 22};   // Level size in cells
-     int winScale = 40;                 // Scale
+     savedata gamesettings = ReadSavegame();
+     //cpoint map;   // Level size in cells
+     //int winScale;                 // Scale
      int GameTicks;                     // Latency (in ms) between game loops
-     cpoint apple;                      // Apple coordinates
-     snake anaconda = {.maxscore = 0};  // Our snake
+     snake anaconda;  // Our snake
+     
+     cpoint map = gamesettings.gamemap;
+     int winScale = gamesettings.gamescale;
+     anaconda.maxscore = gamesettings.gamemaxscore;
 
      RECT ScoreTable;                   // Size of score table
      SetRect(&ScoreTable, 0, 0, 7 * winScale, 16 * winScale);
@@ -133,11 +195,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      WNDCLASSW wcl;
          memset(&wcl, 0, sizeof(WNDCLASSW));
          wcl.lpszClassName = L"mainwin";
+         wcl.style = CS_PARENTDC;
          wcl.lpfnWndProc = WndProc;
      RegisterClass(&wcl);
 
      HWND hwnd = CreateWindowW(L"mainwin", L"Lonely Snake", WS_OVERLAPPEDWINDOW&(~WS_MAXIMIZEBOX)&(~WS_THICKFRAME) | WS_VISIBLE,
-                         10, 10, ((map.x+11)*winScale+winScale/2), (map.y+3)*winScale, NULL, NULL, NULL, NULL);
+                         10, 10, ((map.x+11)*winScale+winScale/2), (map.y+4)*winScale, NULL, NULL, NULL, NULL);
      
      // Separate window with game level
      HWND game_map = CreateWindowW(L"STATIC", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, winScale+winScale/2,
@@ -148,12 +211,33 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      HWND scores = CreateWindowW(L"STATIC", NULL, SS_CENTER | WS_VISIBLE | WS_CHILD | WS_BORDER, (map.x+3)*winScale, winScale,
                                   ScoreTable.right, ScoreTable.bottom, hwnd, NULL, NULL, NULL);
      
+     
+     // Font for scoreboard
      HFONT hFont = CreateFont(winScale, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
                    OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, FALSE);
+
+     // Make main menu
+     HMENU My_Main_Menu_Bar = CreateMenu();
+          HMENU hPopMenuFile1 = CreatePopupMenu();
+          HMENU hPopMenuFile2 = CreatePopupMenu();
+
+          AppendMenuW(My_Main_Menu_Bar, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile1, L"Map size"); // В примерах UINT, реально UINT_PTR!
+          AppendMenuW(My_Main_Menu_Bar, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile2, L"Scale");
+            
+          AppendMenuW(hPopMenuFile1, MF_STRING , 1001, L"Small");
+          AppendMenuW(hPopMenuFile1, MF_STRING , 1002, L"Medium");
+          AppendMenuW(hPopMenuFile1, MF_STRING , 1003, L"Big");
+          AppendMenuW(hPopMenuFile2, MF_STRING , 1011, L"Short");
+          AppendMenuW(hPopMenuFile2, MF_STRING , 1012, L"Large");
+
+          SetMenu(hwnd, My_Main_Menu_Bar);
+          SetMenu(hwnd, hPopMenuFile1);
+          SetMenu(hwnd, hPopMenuFile2);
+     
      MSG msg;
    
      SnakeRestart(&map, &GameTicks, &anaconda);            // Game initialization
-     apple = GetApple(&map, &anaconda.len, anaconda.body);  // And the creation of an apple
+     cpoint apple = GetApple(&map, &anaconda.len, anaconda.body);  // And the creation of an apple
      DWORD next_game_tick = GetTickCount();                // Timer for game loop
      DWORD next_render_tick = GetTickCount();              // Timer for render loop
      srand(GetTickCount());                                // For generate Apple
@@ -162,8 +246,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      {
           if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
           {
-              if (msg.message == WM_QUIT) break;
-              if (msg.message == WM_KEYDOWN) DispatchVector(msg.wParam, &anaconda.newvectr);
+              if (msg.message == WM_QUIT)
+              {
+                   WriteSavegame(map, winScale, anaconda.maxscore);
+                   break;
+              }
+              if (msg.message == WM_KEYDOWN) DispatchVector(msg.wParam, &anaconda.newvectr, &next_game_tick);
+              if (msg.message == WM_COMMAND)
+              {
+                   DispatchMenu(msg.wParam, &map, &winScale);
+                   WriteSavegame(map, winScale, anaconda.maxscore);
+                   break;
+              }
               DispatchMessageW(&msg);
           }
           
@@ -186,5 +280,5 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
               next_render_tick += 15;    // ~60fps
           }
      }
-     return(0);
+     return 0;
 }

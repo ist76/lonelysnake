@@ -15,6 +15,13 @@ typedef struct snake      // All snake data
      cpoint body[254];    // An array of segment coordinates (I hope 254 is enough for everyone)
 } snake;
 
+typedef struct savedata
+{
+     cpoint gamemap;
+     int gamescale;
+     int gamemaxscore;
+} savedata;
+
 void SnakeRestart(cpoint const *gamemap, int *ticks, snake *vyper);
 int IfCannibal(cpoint const *dot, int const *len, cpoint const *body);
 cpoint GetApple(cpoint const *gamemap, int const *len, cpoint const *body);
