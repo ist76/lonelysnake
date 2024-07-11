@@ -1,3 +1,5 @@
+// Basic structures - cell point and snake
+
 typedef struct cpoint // The logic of the game is calculated in "cells"
 {
      int x, y;
