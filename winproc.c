@@ -35,7 +35,8 @@ void ActorsShow(HDC dc, cpoint const *gamemap, cpoint const *body, cpoint const 
      // Draw apple
      SelectObject(memDC, GetStockObject(DC_BRUSH));
      SetDCPenColor(memDC, RGB(8, 16, 8));
-     SetDCBrushColor(memDC, RGB(249, 16, 16));
+     int gChan = (len%10 == 0) ? 128 : 16;  // Reg or Gold apple
+     SetDCBrushColor(memDC, RGB(249, gChan, 16));
                Ellipse(memDC, apple->x*scale +2, apple->y*scale +2, (apple->x+1)*scale -2, (apple->y+1)*scale -2);
 
      // Draw Snake

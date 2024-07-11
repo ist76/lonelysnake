@@ -64,7 +64,10 @@ int SnakeLogic(cpoint const *gamemap, cpoint *apple, int *ticks, snake *vyper)
      
      if ((IfCannibal(apple, &vyper->len, vyper->body)) || ((head.x == apple->x) && (head.y == apple->y))) // not good (((
      {
-          vyper->coins = vyper->coins + 95 + 5*vyper->len;  // Score growth depending on tail length
+          vyper->coins = (vyper->len%10 == 0)?                 // Score growth depending on tail length
+                         (vyper->coins + 50*vyper->len):       // If the length is a multiple of 10
+                         (vyper->coins + 95 + 5*vyper->len);   // Else
+
           ++vyper->len; // The snake has become longer, and the coordinate of the tail has already moved to where we need it
           *ticks = *ticks >=128 ? *ticks -2 : *ticks -1;  // Speed ​​up the game with every apple you eat
           *apple = GetApple(gamemap, &vyper->len, vyper->body);
