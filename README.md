@@ -9,3 +9,5 @@ Customizable game level sizes and window scaling
 Increasing speed, two types of apples
 
 Can be compiled in the MSYS2 environment using GCC or Clang, requires mingw-w64-libgdiplus installed.
+
+[alt text](https://github.com/ist76/lonelysnake/blob/main/Screenshot.PNG?raw=true)
