@@ -1,3 +1,5 @@
+// Launching the application, drawing windows and the main loop - here
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
@@ -10,25 +12,20 @@
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-     switch (message)
-     {
-     case WM_DESTROY: PostQuitMessage(0);
-	}
+     switch (message) case WM_DESTROY: PostQuitMessage(0);
      return DefWindowProc(hwnd, message, wparam, lparam);
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-     savedata gamesettings = ReadSavegame();
-     int GameTicks;   // Latency (in ms) between game loops
-     snake anaconda;  // Our snake
-     
-     cpoint map = gamesettings.gamemap;       // Level size in cells
-     int winScale = gamesettings.gamescale;   // Scale
-     anaconda.maxscore = gamesettings.gamemaxscore;
-
-     RECT ScoreTable;                        // Size of score table
-     SetRect(&ScoreTable, 0, 0, 7 * winScale, 16 * winScale);
+     savedata gamesettings = ReadSavegame();           // Get previously saved data
+     int GameTicks;                                    // Latency (in ms) between game loops
+     snake anaconda;                                   // Our snake
+     cpoint map = gamesettings.gamemap;                // Level size in cells
+     int winScale = gamesettings.gamescale;            // Scale
+     anaconda.maxscore = gamesettings.gamemaxscore;    // User's game record
+     RECT ScoreTable;                                  // Size of score table
+     SetRect(&ScoreTable, 0, 0, 7 * winScale, 16 * winScale);  // Size of scoretable's window
      
      WNDCLASSW wcl;
          memset(&wcl, 0, sizeof(WNDCLASSW));
@@ -44,12 +41,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      // Separate window with game level
      HWND game_map = CreateWindowW(L"Message", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, winScale+winScale/2,
                                    winScale, map.x*winScale, map.y*winScale, hwnd, NULL, NULL, NULL);    
-          
      
      // Make Scoreboard
      HWND scores = CreateWindowW(L"Message", NULL, SS_CENTER | WS_VISIBLE | WS_CHILD | WS_BORDER, (map.x+3)*winScale, winScale,
                                   ScoreTable.right, ScoreTable.bottom, hwnd, NULL, NULL, NULL);
-     
      
      // Font for scoreboard
      HFONT hFont = CreateFont(winScale, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
@@ -81,14 +76,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      DWORD next_render_tick = GetTickCount();                       // Timer for render loop
      srand(GetTickCount());                                         // For generate Apple
 
-     for(;anaconda.len < 253;) // Main Game loop
+     for(;anaconda.len < 253;) // Main Game loop. Remember the snake.body[254]? We don't need to go beyond the array
      {
           if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
           {
               if (msg.message == WM_QUIT)
               {
                    WriteSavegame(map, winScale, anaconda.maxscore);
-                   break;
+                   break;  // Autosave on exit
               }
               if (msg.message == WM_KEYDOWN) DispatchVector(msg.wParam, &anaconda.newvectr, &next_game_tick);
               if (msg.message == WM_COMMAND)
@@ -97,14 +92,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                    SnakeRestart(&map, &GameTicks, &anaconda);
                    WriteSavegame(map, winScale, anaconda.maxscore);
                    break;
-                   //RedrawWindow(hwnd, NULL, NULL, RDW_ALLCHILDREN);
+                   //RedrawWindow(hwnd, NULL, NULL, RDW_ALLCHILDREN); not working yet
               }
               DispatchMessageW(&msg);
           }
           
           Sleep(1); // Sleep, save the Battery!
           
-          while((GetTickCount() > next_game_tick))
+          while(GetTickCount() > next_game_tick)
           {
               if (SnakeLogic(&map, &apple, &GameTicks, &anaconda)) SnakeRestart(&map, &GameTicks, &anaconda);
               HDC sdc = GetDC(scores);  // Draw scores
@@ -113,12 +108,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
               next_game_tick += GameTicks;
           }
 
-          while((GetTickCount() > next_render_tick))
+          while(GetTickCount() > next_render_tick)
           {
-              HDC dc = GetDC(game_map); // --> Here we will draw it!
+              HDC dc = GetDC(game_map);
               ActorsShow(dc, &map, anaconda.body, &apple, winScale, anaconda.len);
               ReleaseDC(game_map, dc);
-              next_render_tick += 15;    // ~60fps
+              next_render_tick += 16;    // ~60fps
           }
      }
      return 0;

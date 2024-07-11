@@ -1,3 +1,5 @@
+// Savefile structure and function prototypes
+
 typedef struct savedata
 {
      cpoint gamemap;

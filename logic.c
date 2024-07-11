@@ -1,3 +1,5 @@
+// Almost all the logic of the game is here
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "snakestruct.h"

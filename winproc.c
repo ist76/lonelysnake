@@ -1,3 +1,6 @@
+// Helper functions for a windowed application
+// Responsible for drawing the level, leaderboards, reading and writing the save file
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
@@ -54,10 +57,8 @@ void ActorsShow(HDC dc, cpoint const *gamemap, cpoint const *body, cpoint const 
 // Drawing the score table
 void ScoresShow(HDC dc, int scale, int coins, int maxscore, HFONT font, RECT * const rt)
 {
-     
      wchar_t score[127];
      _swprintf(score,L"\nScore\n\n%07i\n\nMax Score\n\n%07i", coins, maxscore, *rt);
-     
      
      HDC memDC = CreateCompatibleDC(dc);
      HBITMAP memBM = CreateCompatibleBitmap(dc, rt->right, rt->bottom);
@@ -65,11 +66,10 @@ void ScoresShow(HDC dc, int scale, int coins, int maxscore, HFONT font, RECT * c
      SelectObject(memDC, GetStockObject(DC_BRUSH));
      SetDCBrushColor(memDC, RGB(248, 248, 248));
          Rectangle(memDC, rt->left, rt->top, rt->right, rt->bottom);
-    
      
      SelectObject(memDC, font);
      SetBkColor(memDC, RGB(248, 248, 248));
-     DrawTextW(memDC, score, -1, rt, DT_CENTER);
+     DrawTextW(memDC, score, -1, rt, DT_CENTER); // Writes text directly to the window
 
      BitBlt(dc, rt->left, rt->top, rt->right, rt->bottom, memDC, 0, 0, SRCCOPY);     
      DeleteDC(memDC);
@@ -81,12 +81,12 @@ void DispatchVector(WPARAM key, cpoint * newvect, DWORD * next_tick)
 {
      switch (key)
      {
-     case 0x25:               // Key RIGHT
+     case 0x25:               // Key LEFT
           newvect->x = -1;
           newvect->y = 0;
           break;
      
-     case 0x27:               // Key LEFT
+     case 0x27:               // Key RIGHT
           newvect->x = 1;
           newvect->y = 0;
           break;
@@ -110,6 +110,7 @@ void DispatchVector(WPARAM key, cpoint * newvect, DWORD * next_tick)
      }
 }
 
+// Handling menu item selections
 void DispatchMenu(WPARAM val, cpoint * map, int * scale)
 {
      switch (val)
@@ -142,13 +143,13 @@ void DispatchMenu(WPARAM val, cpoint * map, int * scale)
      }
 }
 
-savedata ReadSavegame()
+savedata ReadSavegame() // No comments..
 {
      savedata usersave = { .gamemap = {.x = 30, .y = 20},
                            .gamescale = 38,
                            .gamemaxscore = 0};
      HANDLE hFile = CreateFile(L"snake.sav", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-     if (INVALID_HANDLE_VALUE == hFile) return usersave; // FIXME! Write check later
+     if (INVALID_HANDLE_VALUE == hFile) return usersave; // FIXME! Write check correctness later
      ReadFile(hFile, &usersave, sizeof(usersave), NULL, NULL);
      CloseHandle(hFile);
      return usersave;
