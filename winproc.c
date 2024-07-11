@@ -77,6 +77,28 @@ void ScoresShow(HDC dc, int scale, int coins, int maxscore, HFONT font, RECT * c
      DeleteObject(memBM);
 }
 
+// Drawing the solution
+void SolutionShow(HDC dc, int scale, HFONT font, RECT * const rt)
+{
+     wchar_t solution[256];
+     _swprintf(solution, L"\n\n\n\nTo start the game \njust select a direction\n\nSelecting direction - \narrows on the keyboard\n\nEscape - pause\n\n\nAll changes to game \nsettings require a \nrestart\n", *rt);
+     
+     HDC memDC = CreateCompatibleDC(dc);
+     HBITMAP memBM = CreateCompatibleBitmap(dc, rt->right, rt->bottom);
+     SelectObject(memDC, memBM);
+     SelectObject(memDC, GetStockObject(DC_BRUSH));
+     SetDCBrushColor(memDC, RGB(248, 248, 248));
+         Rectangle(memDC, rt->left, rt->top, rt->right, rt->bottom);
+     
+     SelectObject(memDC, font);
+     SetBkColor(memDC, RGB(248, 248, 248));
+     DrawTextW(memDC, solution, -1, rt, DT_CENTER); // Writes text directly to the window
+
+     BitBlt(dc, rt->left, rt->top, rt->right, rt->bottom, memDC, 0, 0, SRCCOPY);     
+     DeleteDC(memDC);
+     DeleteObject(memBM);
+}
+
 // Converts keystrokes into movement direction (in game logic format)
 void DispatchVector(WPARAM key, cpoint * newvect, DWORD * next_tick)
 {

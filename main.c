@@ -25,12 +25,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      int winScale = gamesettings.gamescale;            // Scale
      anaconda.maxscore = gamesettings.gamemaxscore;    // User's game record
      RECT ScoreTable;                                  // Size of score table
-     SetRect(&ScoreTable, 0, 0, 7 * winScale, 16 * winScale);  // Size of scoretable's window
+     SetRect(&ScoreTable, 0, 0, 7 * winScale, 11 * winScale);  // Size of scoretable's window
      
      WNDCLASSW wcl;
          memset(&wcl, 0, sizeof(WNDCLASSW));
          wcl.lpszClassName = L"mainwin";
-         wcl.style = CS_PARENTDC;
+         wcl.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+         //wcl.style = CS_GLOBALCLASS | CS_VREDRAW | CS_HREDRAW;
          wcl.lpfnWndProc = WndProc;
      
      RegisterClassW(&wcl);
@@ -39,16 +40,23 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                          10, 10, ((map.x+11)*winScale+winScale/2), (map.y+4)*winScale, NULL, NULL, NULL, NULL);
      
      // Separate window with game level
-     HWND game_map = CreateWindowW(L"Message", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, winScale+winScale/2,
+     HWND game_map = CreateWindowW(L"Message", NULL, WS_VISIBLE | WS_CHILD , winScale+winScale/2,
                                    winScale, map.x*winScale, map.y*winScale, hwnd, NULL, NULL, NULL);    
      
      // Make Scoreboard
-     HWND scores = CreateWindowW(L"Message", NULL, SS_CENTER | WS_VISIBLE | WS_CHILD | WS_BORDER, (map.x+3)*winScale, winScale,
+     HWND scores = CreateWindowW(L"Message", NULL, SS_CENTER | WS_VISIBLE | WS_CHILD , (map.x+3)*winScale, winScale,
                                   ScoreTable.right, ScoreTable.bottom, hwnd, NULL, NULL, NULL);
      
      // Font for scoreboard
-     HFONT hFont = CreateFont(winScale, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
-                   OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, FALSE);
+     HFONT hFont = CreateFontW(winScale, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
+                   OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_SWISS, FALSE);
+
+     HWND solutions = CreateWindowW(L"Message", NULL, SS_CENTER | WS_VISIBLE | WS_CHILD , (map.x+3)*winScale, ScoreTable.bottom + 3 * winScale,
+                                  ScoreTable.right, ScoreTable.bottom, hwnd, NULL, NULL, NULL);
+     
+     HFONT hFont2 = CreateFontW(winScale/2, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
+                    OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_SWISS, FALSE);
+     
 
      // Make main menu
      HMENU My_Main_Menu_Bar = CreateMenu();
@@ -105,6 +113,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
               HDC sdc = GetDC(scores);  // Draw scores
               ScoresShow(sdc, winScale, anaconda.coins, anaconda.maxscore, hFont, &ScoreTable);
               ReleaseDC(scores, sdc);
+              HDC tdc = GetDC(solutions);  // Draw solution
+              SolutionShow(tdc, winScale, hFont2, &ScoreTable);
+              ReleaseDC(solutions, tdc);
               next_game_tick += GameTicks;
           }
 
