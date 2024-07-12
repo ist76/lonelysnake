@@ -81,7 +81,7 @@ void ScoresShow(HDC dc, int scale, int coins, int maxscore, HFONT font, RECT * c
 void SolutionShow(HDC dc, int scale, HFONT font, RECT * const rt)
 {
      wchar_t solution[256];
-     _swprintf(solution, L"\n\n\n\nTo start the game \njust select a direction\n\nSelecting direction - \narrows on the keyboard\n\nEscape - pause\n\n\nAll changes to game \nsettings require a \nrestart\n", *rt);
+     _swprintf(solution, L"\nTo start the game \njust select a direction\n\nSelecting direction - \narrows or «W S A D»\non the keyboard\n\nEscape - pause\n\n\nAll changes to game \nsettings require a \nrestart\n", *rt);
      
      HDC memDC = CreateCompatibleDC(dc);
      HBITMAP memBM = CreateCompatibleBitmap(dc, rt->right, rt->bottom);
@@ -104,7 +104,7 @@ void DispatchVector(WPARAM key, cpoint * newvect, DWORD * next_tick)
 {
      switch (key)
      {
-     case 0x25:               // Key LEFT
+     case 0x41:               // Key LEFT
           newvect->x = -1;
           newvect->y = 0;
           break;
@@ -120,6 +120,26 @@ void DispatchVector(WPARAM key, cpoint * newvect, DWORD * next_tick)
           break;
      
      case 0x28:               // Key DOWN
+          newvect->x = 0;
+          newvect->y = 1;
+          break;
+
+     case 0x25:               // Key LEFT
+          newvect->x = -1;
+          newvect->y = 0;
+          break;
+     
+     case 0x44:               // Key RIGHT
+          newvect->x = 1;
+          newvect->y = 0;
+          break;
+     
+     case 0x57:               // Key UP
+          newvect->x = 0;
+          newvect->y = -1;
+          break;
+     
+     case 0x53:               // Key DOWN
           newvect->x = 0;
           newvect->y = 1;
           break;

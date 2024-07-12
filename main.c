@@ -25,13 +25,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
      int winScale = gamesettings.gamescale;            // Scale
      anaconda.maxscore = gamesettings.gamemaxscore;    // User's game record
      RECT ScoreTable;                                  // Size of score table
-     SetRect(&ScoreTable, 0, 0, 7 * winScale, 11 * winScale);  // Size of scoretable's window
+     SetRect(&ScoreTable, 0, 0, 7 * winScale, (map.x/3 - 1) * winScale);  // Size of scoretable's window
      
      WNDCLASSW wcl;
          memset(&wcl, 0, sizeof(WNDCLASSW));
          wcl.lpszClassName = L"mainwin";
          wcl.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-         //wcl.style = CS_GLOBALCLASS | CS_VREDRAW | CS_HREDRAW;
+         wcl.style = CS_GLOBALCLASS | CS_VREDRAW | CS_HREDRAW;
          wcl.lpfnWndProc = WndProc;
      
      RegisterClassW(&wcl);
@@ -48,13 +48,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                                   ScoreTable.right, ScoreTable.bottom, hwnd, NULL, NULL, NULL);
      
      // Font for scoreboard
-     HFONT hFont = CreateFontW(winScale, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
+     HFONT hFont = CreateFontW((map.y * winScale) / 22, 0, 0, 0, 400, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
                    OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_SWISS, FALSE);
 
      HWND solutions = CreateWindowW(L"Message", NULL, SS_CENTER | WS_VISIBLE | WS_CHILD , (map.x+3)*winScale, ScoreTable.bottom + 3 * winScale,
                                   ScoreTable.right, ScoreTable.bottom, hwnd, NULL, NULL, NULL);
      
-     HFONT hFont2 = CreateFontW(winScale/2, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
+     HFONT hFont2 = CreateFontW((map.y * winScale) / 35, 0, 0, 0, 400, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
                     OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_SWISS, FALSE);
      
 
@@ -100,7 +100,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                    SnakeRestart(&map, &GameTicks, &anaconda);
                    WriteSavegame(map, winScale, anaconda.maxscore);
                    break;
-                   //RedrawWindow(hwnd, NULL, NULL, RDW_ALLCHILDREN); not working yet
+
               }
               DispatchMessageW(&msg);
           }
