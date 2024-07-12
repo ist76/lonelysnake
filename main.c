@@ -66,11 +66,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
           AppendMenuW(My_Main_Menu_Bar, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile1, L"Map size");
           AppendMenuW(My_Main_Menu_Bar, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile2, L"Scale");
             
-          AppendMenuW(hPopMenuFile1, MF_STRING , 1001, L"Small");
-          AppendMenuW(hPopMenuFile1, MF_STRING , 1002, L"Medium");
-          AppendMenuW(hPopMenuFile1, MF_STRING , 1003, L"Big");
-          AppendMenuW(hPopMenuFile2, MF_STRING , 1011, L"Short");
-          AppendMenuW(hPopMenuFile2, MF_STRING , 1012, L"Large");
+          AppendMenuW(hPopMenuFile1, MF_STRING | (map.x == 24 ? MF_CHECKED : MF_UNCHECKED), 1001, L"Small");
+          AppendMenuW(hPopMenuFile1, MF_STRING | (map.x == 30 ? MF_CHECKED : MF_UNCHECKED), 1002, L"Medium");
+          AppendMenuW(hPopMenuFile1, MF_STRING | (map.x == 36 ? MF_CHECKED : MF_UNCHECKED), 1003, L"Big");
+          AppendMenuW(hPopMenuFile2, MF_STRING | (winScale == 32 ? MF_CHECKED : MF_UNCHECKED), 1011, L"Short");
+          AppendMenuW(hPopMenuFile2, MF_STRING | (winScale == 38 ? MF_CHECKED : MF_UNCHECKED), 1012, L"Large");
 
           SetMenu(hwnd, My_Main_Menu_Bar);
           SetMenu(hwnd, hPopMenuFile1);
