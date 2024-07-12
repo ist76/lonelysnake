@@ -1,4 +1,4 @@
-#About
+# About
 
 A simple implementation of the game "Snake" in pure C and WinApi
 
@@ -18,6 +18,7 @@ Can be compiled in the MSYS2 environment using GCC or Clang, requires mingw-w64-
 
 To simply launch the application, just download the single snake.exe file from the “bin” folder. No additional libraries are required, the program should run on any fairly modern 64-bit version of Windows (including, probably, Win7).
 If you have the mingw-w64 environment and mingw-w64-x86_64-toolchain installed, assembly is not difficult: just run 
+
 '''make'''
 
 in a local copy of the repository or build the project manually something like this:
