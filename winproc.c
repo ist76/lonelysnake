@@ -198,7 +198,7 @@ savedata ReadSavegame() // No comments..
      return usersave;
 }
 
-VOID WriteSavegame(cpoint maps, int scale, int maxs)
+void WriteSavegame(cpoint maps, int scale, int maxs)
 {
      HANDLE hFile = CreateFile(L"snake.sav", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
      if (INVALID_HANDLE_VALUE == hFile) return;
@@ -207,4 +207,18 @@ VOID WriteSavegame(cpoint maps, int scale, int maxs)
                            .gamemaxscore = maxs};
      WriteFile(hFile, &usersave, sizeof(usersave), NULL, NULL);
      CloseHandle(hFile);
+}
+
+void RunAppCopy(void)
+{
+     wchar_t path[256];
+     GetModuleFileNameW(0, path, 256); // Get full name of snake.exe
+     STARTUPINFO si;
+     PROCESS_INFORMATION pi;
+     ZeroMemory( &si,sizeof(si));
+     si.cb = sizeof(si);
+     ZeroMemory(&pi, sizeof(pi));
+     CreateProcessW(path, NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+     CloseHandle(pi.hProcess);
+     CloseHandle(pi.hThread);
 }

@@ -99,8 +99,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                    DispatchMenu(msg.wParam, &map, &winScale);
                    SnakeRestart(&map, &GameTicks, &anaconda);
                    WriteSavegame(map, winScale, anaconda.maxscore);
+                   RunAppCopy();
                    break;
-
               }
               DispatchMessageW(&msg);
           }
@@ -115,7 +115,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
               ReleaseDC(scores, sdc);
               HDC tdc = GetDC(solutions);  // Draw solution
               SolutionShow(tdc, winScale, hFont2, &ScoreTable);
-              ReleaseDC(solutions, tdc);
+              ReleaseDC(solutions, tdc);  // Try restart the application. If unsuccessful, no problem, the settings are already saved
               next_game_tick += GameTicks;
           }
 

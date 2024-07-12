@@ -17,4 +17,5 @@ void SolutionShow(HDC dc, int scale, HFONT font, RECT * const rt);
 void DispatchVector(WPARAM key, cpoint * newvect, DWORD * next_tick);
 void DispatchMenu(WPARAM val, cpoint * map, int * scale);
 savedata ReadSavegame();
-VOID WriteSavegame(cpoint maps, int scale, int maxs);
+void WriteSavegame(cpoint maps, int scale, int maxs);
+void RunAppCopy(void);
