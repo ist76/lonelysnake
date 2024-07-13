@@ -6,7 +6,7 @@ May be useful for beginners for educational purposes
 
 - Customizable game level sizes and window scaling
 - Increasing game speed, two types of apples, advanced scoring system
-- 24kB executable file that does not require additional libraries
+- 24kB (with no icon) executable file that does not require additional libraries
 - Can be compiled in the MSYS2 environment using GCC or Clang, requires mingw-w64-libgdiplus installed.
 
 
