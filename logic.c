@@ -5,7 +5,7 @@
 #include "snakestruct.h"
 
 // Warning! The game logic does not check the maxscore value during the first initialization.
-// The null value must be assigned in main
+// The '0' value must be assigned in main
 // Also main should run initialization before the game loop
 void SnakeRestart(cpoint const *gamemap, int *ticks, snake *vyper)
 {
@@ -59,8 +59,8 @@ int SnakeLogic(cpoint const *gamemap, cpoint *apple, int *ticks, snake *vyper)
      
      if ((head.x < 0) || (head.y < 0 ) || (head.x >= gamemap->x) || (head.y >= gamemap->y ) ||
         ((vyper->len != 1) && IfCannibal(&head, &vyper->len, vyper->body)) ||
-        (vyper->coins < 0))
-        return 1; // --> restart round
+        (vyper->coins < 0))  // Don't crash into walls, don't bite yourself, and don't waste all coins else:
+        return 1;            // --> restart round
      
      if ((IfCannibal(apple, &vyper->len, vyper->body)) || ((head.x == apple->x) && (head.y == apple->y))) // not good (((
      {
@@ -75,6 +75,6 @@ int SnakeLogic(cpoint const *gamemap, cpoint *apple, int *ticks, snake *vyper)
      
      for (int i = vyper->len; i > 0; --i) vyper->body[i] = vyper->body[i-1];
      vyper->body[0] = head; // insert head to body
-     --vyper->coins;
+     vyper->coins -= (vyper->len <= 64) ?  1 : 2;
      return 0; // --> normal exit
 }

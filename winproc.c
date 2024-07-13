@@ -1,4 +1,4 @@
-// Helper functions for a windowed application
+// Functions for a windowed application
 // Responsible for drawing the level, leaderboards, reading and writing the save file
 
 #include <stdio.h>
@@ -7,7 +7,7 @@
 #include "snakestruct.h"
 #include "winproc.h"
 
-// Draw the game actors
+// Draw level and the game actors
 void ActorsShow(HDC dc, cpoint const *gamemap, cpoint const *body, cpoint const *apple, int scale, int len)
 {
      HDC memDC = CreateCompatibleDC(dc);
@@ -80,7 +80,7 @@ void ScoresShow(HDC dc, int scale, int coins, int maxscore, HFONT font, RECT * c
 // Drawing the solution
 void SolutionShow(HDC dc, int scale, HFONT font, RECT * const rt)
 {
-     wchar_t solution[256];
+     wchar_t solution[254];
      _swprintf(solution, L"\nTo start the game \njust select a direction\n\nSelecting direction - \narrows or «W S A D»\non the keyboard\n\nEscape - pause\n\n\nAll changes to game \nsettings require a \nrestart\n", *rt);
      
      HDC memDC = CreateCompatibleDC(dc);
@@ -159,26 +159,26 @@ void DispatchMenu(WPARAM val, cpoint * map, int * scale)
      switch (val)
      {
      case 1001:
-          map->x = 24;
-          map->y = 16;
+          map->x = SMALLMAPX;
+          map->y = SMALLMAPY;
           break;
 
      case 1002:
-          map->x = 30;
-          map->y = 20;
+          map->x = MEDIUMMAPX;
+          map->y = MEDIUMMAPY;
           break;
 
      case 1003:
-          map->x = 36;
-          map->y = 24;
+          map->x = LARGEMAPX;
+          map->y = LARGEMAPY;
           break;
 
      case 1011:
-          *scale = 32;
+          *scale = BIGSCALE;
           break;
 
      case 1012:
-          *scale = 38;
+          *scale = HUGESCALE;
           break;
      
      default:
@@ -188,8 +188,8 @@ void DispatchMenu(WPARAM val, cpoint * map, int * scale)
 
 savedata ReadSavegame() // No comments..
 {
-     savedata usersave = { .gamemap = {.x = 30, .y = 20},
-                           .gamescale = 38,
+     savedata usersave = { .gamemap = {.x = MEDIUMMAPX, .y = MEDIUMMAPY},
+                           .gamescale = BIGSCALE,
                            .gamemaxscore = 0};
      HANDLE hFile = CreateFile(L"snake.sav", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
      if (INVALID_HANDLE_VALUE == hFile) return usersave; // FIXME! Write check correctness later
@@ -213,7 +213,7 @@ void RunAppCopy(void)
 {
      wchar_t path[256];
      GetModuleFileNameW(0, path, 256); // Get full name of snake.exe
-     STARTUPINFO si;
+     STARTUPINFO si;  // Example of using CreateProcess from MSDN
      PROCESS_INFORMATION pi;
      ZeroMemory( &si,sizeof(si));
      si.cb = sizeof(si);
