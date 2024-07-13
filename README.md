@@ -16,4 +16,4 @@ May be useful for beginners for educational purposes
 
 To simply launch the application, just download the single snake.exe file from the “bin” folder. No additional libraries are required, the program should run on any fairly modern 64-bit version of Windows (including, probably, Win7).
 If you have the mingw-w64 environment and mingw-w64-x86_64-toolchain installed, assembly is not difficult: just run 'make' in a local copy of the repository or build the project manually something like this:
-```gcc main.c logic.c winproc.c -Wall -lgdi32 -march=corei7 -Os -s -static -municode -mwindows -o snake.exe```
+```$ gcc main.c logic.c winproc.c app.res -lgdi32 -march=corei7 -Os -s -static -municode -mwindows -o snake.exe```
