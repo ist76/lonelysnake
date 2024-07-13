@@ -5,7 +5,7 @@ BIN = snake
 # Flags
 CFLAGS += -Os -s -static -municode -mwindows -march=core2
 
-SRC =  main.c logic.c winproc.c
+SRC =  main.c logic.c winproc.c app.res
 OBJ = $(SRC:.c=.o)
 
 BIN := $(BIN).exe
